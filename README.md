@@ -136,7 +136,7 @@ npm start -- --staging
 
 `npm run setup` 会把 DSH 版本写入对应 Profile 目录的 `xunji-dsh-version`；升级根依赖后、尚未对稳定 `.dsh/` 运行 `setup` 之前，`npm start` 会拒绝用新 CLI 启动旧 Profile，避免会话数据被提前单向迁移。切换步骤见 `docs/upgrading.md`。
 
-详细边界见 `docs/architecture.md`，升级清单见 `docs/upgrading.md`，给同事的安装与使用说明见 `docs/使用说明.md`。
+详细边界见 `docs/architecture.md`，升级清单见 `docs/upgrading.md`，给同事的安装与使用说明见 `docs/使用说明.md`，哪些数据会离开本机见 `docs/隐私说明.md`。
 
 ## 安全原则
 
