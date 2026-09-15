@@ -520,14 +520,22 @@ function XunjiPanel({ listPlugins }: PanelProps): ReactNode {
   </section>
 }
 
-/** 工作台图标：与桌面程序同一张品牌图，侧栏入口与面板标题共用。 */
+/** 面板标题用的品牌图：与桌面程序同一张图。 */
 function WorkbenchGlyph({ size, className }: { size: number; className?: string }): ReactNode {
   return <img className={className} src={BRAND_ICON} width={size} height={size} alt="" draggable={false} aria-hidden="true"/>
 }
 
+/** 侧栏入口图标：与宿主“新会话”同为单色线条风格，图形沿用品牌图的对话气泡加代码符号。 */
+function SidebarGlyph({ size, className }: { size: number; className?: string }): ReactNode {
+  return <svg className={className} viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M8 4.5h8a4 4 0 0 1 4 4v5a4 4 0 0 1-4 4h-5l-3.5 3v-3H8a4 4 0 0 1-4-4v-5a4 4 0 0 1 4-4z"/>
+    <path d="M10.5 8.8 8.5 11l2 2.2M13.5 8.8l2 2.2-2 2.2"/>
+  </svg>
+}
+
 /** 左侧栏入口的图标；按钮本身由侧栏渲染，标题取自注册时的 label。 */
 function XunjiPanelIcon({ size }: PanelIconProps): ReactNode {
-  return <WorkbenchGlyph size={size} className="xunji-panel-glyph"/>
+  return <SidebarGlyph size={size} className="xunji-panel-glyph"/>
 }
 
 function installStyle(): () => void {

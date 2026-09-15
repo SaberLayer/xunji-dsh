@@ -13,7 +13,7 @@
 - 代码库：可登记一个或多个本机项目根目录，建立增量只读索引；自动排除依赖、构建产物、版本库和 `.env`。
 - 历史归档：可按需索引本机 Codex 会话、Claude 项目记忆与输入历史，供检索此前的方案、想法和操作摘要；不读取凭据或日志。
 - 飞书对话导入：把飞书客户端「导出到文档 → 下载为 Markdown」得到的 zip 或 md 上传到工作台，按消息逐条建立本机只读索引；同一会话多次导出自动合并去重，不连接飞书、不上传任何内容。
-- MasterGo：只读官方 `@mastergo/magic-mcp@0.2.8`，不接入可修改画布的 Vibe MCP。
+- MasterGo：官方 `@mastergo/magic-mcp@0.2.8` 经本机只读代理启动，只放行读取设计结构、组件文档与图标的 6 个工具；它自带的 C2d（代码同步回设计稿）、getD2c 与 applyDesign（写本地文件）对模型不可见。不接入可修改画布的 Vibe MCP。
 - 飞书资料：官方 `@larksuiteoapi/lark-mcp@0.5.1`，固定只开放 4 个文档/知识库读取工具，不能由环境变量放宽。
 - Confluence Server/Data Center：`mcp-atlassian==0.23.0`，仅 stdio、只读、3 个查询工具，兼容 6.0+。
 
@@ -145,3 +145,4 @@ npm start -- --staging
 - Confluence DC 固定安全修复版本，强制只读工具白名单。
 - 飞书 MCP 默认不开放消息发送、文档导入、权限变更等写工具。
 - MasterGo 只允许 Magic MCP 读取设计资料；禁止接入 Vibe MCP 的画布写入能力，令牌不进入命令行参数或 YAML。
+- 第三方 MCP 一律经 `scripts/mcp-readonly-proxy.mjs` 启动：DSH 客户端不过滤工具，代理负责只暴露白名单工具并拒绝白名单外的调用。

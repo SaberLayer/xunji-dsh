@@ -123,6 +123,8 @@ export function resolveHome(staging = false) {
 }
 
 export function commandExists(command) {
+  // 当前进程就是 node；安装版用的是随包的运行时，不在 PATH 上，不能靠 where 去找
+  if (command === 'node') return true
   const finder = process.platform === 'win32' ? 'where.exe' : 'which'
   return spawnSync(finder, [command], { stdio: 'ignore' }).status === 0
 }
@@ -229,7 +231,8 @@ export const featureRequirements = {
   mastergo: {
     patch: 'mastergo.cordis.patch.yml',
     env: ['MG_MCP_TOKEN'],
-    commands: ['npx'],
+    // 经本机只读代理拉起官方 MCP，两者都要能找到
+    commands: ['node', 'npx'],
   },
   lark: {
     patch: 'lark.cordis.patch.yml',

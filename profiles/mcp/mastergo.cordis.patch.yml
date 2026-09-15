@@ -1,14 +1,22 @@
+# MasterGo 官方 Magic MCP 自带写操作（C2d 会把代码同步回设计稿，getD2c / applyDesign 会写本地文件），
+# 因此经只读代理启动，只放行读取设计结构、组件文档与图标的工具。
 - insert:
     - id: mcp-mastergo
       name: '@deepseek-ai/dsh-mcp-client'
       config:
         serverName: mastergo
         transport: stdio
-        command: npx
-        args: ['-y', '@mastergo/magic-mcp@0.2.8']
+        command: node
+        args:
+          - 'scripts/mcp-readonly-proxy.mjs'
+          - '--allow'
+          - 'mcp__getDesignSections,mcp__getPageLayers,mcp__getDsl,mcp__getMeta,mcp__getComponentLink,mcp__extractSvg'
+          - '--'
+          - 'npx'
+          - '-y'
+          - '@mastergo/magic-mcp@0.2.8'
         env:
           MG_MCP_TOKEN: !!js process.env.MG_MCP_TOKEN
           API_BASE_URL: !!js process.env.MASTERGO_API_BASE_URL
         toolCallTimeoutMs: 60000
         failOnStartupError: false
-

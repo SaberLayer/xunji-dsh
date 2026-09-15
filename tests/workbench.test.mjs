@@ -72,6 +72,11 @@ test('飞书与 MasterGo 资料源明确禁止写入', () => {
   assert.doesNotMatch(larkPatch, /process\.env\.LARK_TOOLS/)
   assert.match(mastergoPatch, /@mastergo\/magic-mcp@0\.2\.8/)
   assert.doesNotMatch(mastergoPatch, /@mastergo\/vibe-mcp/)
+  // Magic MCP 自带写操作，必须经只读代理启动，且白名单里不能出现写工具
+  assert.match(mastergoPatch, /scripts\/mcp-readonly-proxy\.mjs/)
+  const allowList = /--allow'\s*\n\s*- '([^']+)'/.exec(mastergoPatch)?.[1] ?? ''
+  assert.ok(allowList.includes('mcp__getDsl'))
+  for (const writer of ['C2d', 'applyDesign', 'getD2c']) assert.ok(!allowList.includes(writer), `${writer} 不得放行`)
 })
 
 test('默认模型支持将设计稿截图作为图片输入', () => {
