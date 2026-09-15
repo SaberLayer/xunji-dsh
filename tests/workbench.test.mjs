@@ -70,6 +70,9 @@ test('飞书与 MasterGo 资料源明确禁止写入', () => {
   assert.match(AUTO_ROUTING_PROMPT, /不得修改画布、文件、变量或组件库/)
   assert.match(larkPatch, /docx\.v1\.document\.rawContent,docx\.builtin\.search,wiki\.v2\.space\.getNode,wiki\.v1\.node\.search/)
   assert.doesNotMatch(larkPatch, /process\.env\.LARK_TOOLS/)
+  // 凭据只走环境变量，不放进命令行参数，避免出现在进程列表里
+  assert.match(larkPatch, /APP_SECRET: !!js process\.env\.LARK_APP_SECRET/)
+  assert.doesNotMatch(larkPatch, /'-a'|'-s'/)
   assert.match(mastergoPatch, /@mastergo\/magic-mcp@0\.2\.8/)
   assert.doesNotMatch(mastergoPatch, /@mastergo\/vibe-mcp/)
   // Magic MCP 自带写操作，必须经只读代理启动，且白名单里不能出现写工具
@@ -351,7 +354,7 @@ test('安装包允许选择安装位置、免提权，且卸载不删用户数�
   assert.match(installer, /UninstallDelete/)
 })
 
-test('分发包自带 pnpm，否则同事机器上无法初始化 Profile', () => {
+test('分发包自带 pnpm，否则目标机器上无法初始化 Profile', () => {
   const packager = readFileSync(new URL('../scripts/package-app.mjs', import.meta.url), 'utf8')
   const common = readFileSync(new URL('../scripts/common.mjs', import.meta.url), 'utf8')
   assert.match(packager, /pnpm: versions\.packageManager\.split\('@'\)\[1\]/)

@@ -1,3 +1,5 @@
+# 凭据经环境变量传给官方 MCP（它读取 APP_ID / APP_SECRET），不出现在命令行，本机进程列表看不到。
+# 工具白名单同时通过 -t 参数和 LARK_TOOLS 固定为 4 个文档 / 知识库只读接口，用户环境无法放宽。
 - insert:
     - id: mcp-lark
       name: '@deepseek-ai/dsh-mcp-client'
@@ -9,12 +11,11 @@
           - '-y'
           - '@larksuiteoapi/lark-mcp@0.5.1'
           - 'mcp'
-          - '-a'
-          - !!js process.env.LARK_APP_ID
-          - '-s'
-          - !!js process.env.LARK_APP_SECRET
           - '-t'
           - 'docx.v1.document.rawContent,docx.builtin.search,wiki.v2.space.getNode,wiki.v1.node.search'
-        env: {}
+        env:
+          APP_ID: !!js process.env.LARK_APP_ID
+          APP_SECRET: !!js process.env.LARK_APP_SECRET
+          LARK_TOOLS: 'docx.v1.document.rawContent,docx.builtin.search,wiki.v2.space.getNode,wiki.v1.node.search'
         toolCallTimeoutMs: 60000
         failOnStartupError: false

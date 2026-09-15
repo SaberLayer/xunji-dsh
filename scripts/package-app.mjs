@@ -121,7 +121,7 @@ function installInto(target) {
     type: manifest.type,
     engines: manifest.engines,
     // DSH 初始化 Profile 时会调用 pnpm 安装插件，必须随包分发，
-    // 不能指望同事机器上装了 pnpm。
+    // 不能指望目标机器上装了 pnpm。
     // 与仓库根 importer 保持同一分类，直接复用已验证的完整依赖锁。
     devDependencies: {
       '@deepseek-ai/dsh': versions.dsh.version,
