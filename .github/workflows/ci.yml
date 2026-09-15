@@ -1,0 +1,23 @@
+# 每个 PR 和 main 上的每次推送都跑一遍体检、类型检查、插件构建和测试。
+# 桌面外壳的 Rust 编译和安装包不在这里跑，那两步需要 Rust 与 Inno Setup，发布时在本机完成。
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: 安装依赖
+        run: npx -y pnpm@11.21.0 install --frozen-lockfile
+      - name: 体检、类型检查、构建与测试
+        run: npm run check
+        env:
+          CI: 'true'

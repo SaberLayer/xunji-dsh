@@ -59,6 +59,10 @@ npm run package:installer
 | `shell/` | Tauri 桌面外壳 |
 | `docs/` | 使用说明、隐私说明、开发指南 |
 
+## 参与开发
+
+分支约定、本地验证和提 PR 的方式见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
 ## 许可证
 
 [MIT](LICENSE)
