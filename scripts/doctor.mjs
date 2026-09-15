@@ -63,8 +63,8 @@ for (const path of profileFiles) {
 
 if (existsSync(basePatch)) {
   const baseConfig = readFileSync(basePatch, 'utf8')
-  if (!/id: agent-default-model\s+config:\s+provider: deepseek-official\s+model: deepseek-v4-flash-vision-exp/m.test(baseConfig)) {
-    problems.push('默认模型必须为支持图片输入的 deepseek-v4-flash-vision-exp')
+  if (!/id: agent-default-model\s+config:\s+provider: deepseek-official\s+model: deepseek-flash\b/m.test(baseConfig)) {
+    problems.push('默认模型必须为支持图片输入的 deepseek-flash')
   }
 }
 

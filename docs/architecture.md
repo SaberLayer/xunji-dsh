@@ -58,7 +58,7 @@ DSH 0.1.5-rc.2
 
 - 飞书 Profile 固定为正文读取、文档搜索、知识库节点读取和节点搜索四项工具；文档导入、编辑、协作者权限与消息发送均不在启动参数中。
 - MasterGo 固定使用 `@mastergo/magic-mcp` 获取 DSL/D2C 设计上下文；不接入 `@mastergo/vibe-mcp`，因此不会获得画布、变量或组件库的创建和修改能力。
-- 默认 DeepSeek 模型为 `deepseek-v4-flash-vision-exp`：可读取用户显式附加的设计稿截图，不会获得 MasterGo 的额外权限，也不会自动抓取或上传远端设计文件。
+- 默认 DeepSeek 模型为 `deepseek-flash`：可读取用户显式附加的设计稿截图，不会获得 MasterGo 的额外权限，也不会自动抓取或上传远端设计文件。
 - 令牌对应的飞书应用与 MasterGo 账号也应只授予目标资料的查看权限；运行时白名单不能替代上游账号权限控制。
 
 ## 桌面外壳

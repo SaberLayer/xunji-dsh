@@ -83,10 +83,10 @@ test('飞书与 MasterGo 资料源明确禁止写入', () => {
   for (const writer of ['C2d', 'applyDesign', 'getD2c']) assert.ok(!allowList.includes(writer), `${writer} 不得放行`)
 })
 
-test('默认模型支持将设计稿截图作为图片输入', () => {
+test('默认模型为支持图片输入的 deepseek-flash', () => {
   const basePatch = readFileSync(new URL('../profiles/base.cordis.patch.yml', import.meta.url), 'utf8')
   assert.match(basePatch, /id: agent-default-model/)
-  assert.match(basePatch, /model: deepseek-v4-flash-vision-exp/)
+  assert.match(basePatch, /model: deepseek-flash$/m)
 })
 
 test('图形化配置指引仅暴露变量名、只读范围与按需启动命令', () => {
