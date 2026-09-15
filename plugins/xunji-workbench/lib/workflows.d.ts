@@ -54,9 +54,16 @@ declare const SOURCES: readonly SourceDefinition[];
  * 前端的提示词拼装函数里，该函数停用后规则就静默失效了。
  */
 declare const AUTO_ROUTING_PROMPT: string;
+/** 解析“名称=链接;名称=链接”格式的设计稿登记表；无效条目忽略。 */
+declare function parseMasterGoFiles(value: string | undefined): readonly {
+  readonly name: string;
+  readonly link: string;
+}[];
+/** Host 实际注入的路由提示词：在固定规则后附上已登记的设计稿，让模型能按名称定位文件。 */
+declare function routingPromptWith(environment: Record<string, string | undefined>): string;
 declare const CONNECTORS: readonly ConnectorDefinition[];
 declare const CONFIGURATION_GUIDES: readonly ConfigurationGuide[];
 declare function connectorPhases(entries: readonly InventoryEntry[]): Record<ConnectorId, ConnectorPhase>;
 //#endregion
-export { AUTO_ROUTING_PROMPT, CONFIGURATION_GUIDES, CONNECTORS, ConfigurationField, ConfigurationGuide, ConnectorId, ConnectorPhase, InventoryEntry, SOURCES, connectorPhases };
+export { AUTO_ROUTING_PROMPT, CONFIGURATION_GUIDES, CONNECTORS, ConfigurationField, ConfigurationGuide, ConnectorId, ConnectorPhase, InventoryEntry, SOURCES, connectorPhases, parseMasterGoFiles, routingPromptWith };
 //# sourceMappingURL=workflows.d.ts.map

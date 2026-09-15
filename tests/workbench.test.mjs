@@ -9,6 +9,7 @@ import {
   AUTO_ROUTING_PROMPT,
   CONFIGURATION_GUIDES,
   connectorPhases,
+  routingPromptWith,
   SOURCES,
 } from '../plugins/xunji-workbench/lib/workflows.js'
 
@@ -37,7 +38,7 @@ test('自动资料路由作为 Host 系统提示词注入，而非仅保留前�
   const source = readFileSync(new URL('../plugins/xunji-workbench/src/index.ts', import.meta.url), 'utf8')
   assert.match(source, /inject = \['systemPrompt'\]/)
   assert.match(source, /xunji:auto-routing/)
-  assert.match(source, /AUTO_ROUTING_PROMPT/)
+  assert.match(source, /routingPromptWith\(process\.env\)/)
 })
 
 test('会话完成后会基于真实工具调用显示资料来源', () => {
@@ -117,6 +118,16 @@ test('配置服务接受 Windows 代码库绝对路径', () => {
   assert.equal(validValue('XUNJI_CODEBASE_PATHS', 'C:\\workspace\\demo-project'), true)
   assert.equal(validValue('XUNJI_CODEBASE_PATHS', 'C:\\repo-a;D:\\repo-b'), true)
   assert.equal(validValue('XUNJI_CODEBASE_PATHS', 'demo-project'), false)
+})
+
+test('设计稿登记只接受“名称=https 链接”，并附在路由提示词末尾', () => {
+  assert.equal(validValue('XUNJI_MASTERGO_FILES', '商城后台=https://mastergo.com/file/1;官网=https://mastergo.com/file/2'), true)
+  assert.equal(validValue('XUNJI_MASTERGO_FILES', '商城后台=mastergo.com/file/1'), false)
+  assert.equal(validValue('XUNJI_MASTERGO_FILES', ''), true)
+  const prompt = routingPromptWith({ XUNJI_MASTERGO_FILES: '商城后台=https://mastergo.com/file/1' })
+  assert.ok(prompt.startsWith(AUTO_ROUTING_PROMPT))
+  assert.match(prompt, /商城后台：https:\/\/mastergo\.com\/file\/1/)
+  assert.equal(routingPromptWith({}), AUTO_ROUTING_PROMPT)
 })
 
 test('自动选择会将已填写凭据的资料源纳入启动清单', () => {

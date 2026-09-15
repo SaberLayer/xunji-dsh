@@ -10,6 +10,7 @@ export const CONFIG_PORT = 37651
 export const CONFIG_VARIABLES = [
   'MG_MCP_TOKEN',
   'MASTERGO_API_BASE_URL',
+  'XUNJI_MASTERGO_FILES',
   'LARK_APP_ID',
   'LARK_APP_SECRET',
   'CONFLUENCE_URL',
@@ -50,6 +51,12 @@ function send(response, status, body, origin) {
 export function validValue(key, value) {
   if (typeof value !== 'string' || value.length > 4096 || /[\x00-\x1f]/.test(value)) return false
   if (key === 'MASTERGO_API_BASE_URL' || key === 'CONFLUENCE_URL') return value === '' || /^https?:\/\//i.test(value)
+  // 设计稿登记：名称=链接，多个用英文分号分隔；链接必须是 https，避免把随手文字当成登记
+  if (key === 'XUNJI_MASTERGO_FILES') {
+    if (value === '') return true
+    const entries = value.split(';').map((entry) => entry.trim()).filter(Boolean)
+    return entries.length > 0 && entries.every((entry) => /^[^=;]+=https:\/\/\S+$/i.test(entry))
+  }
   if (key === 'XUNJI_CONVERSATION_ARCHIVE') return value === '' || value.split(',').map((item) => item.trim().toLocaleLowerCase()).every((item) => item === 'codex' || item === 'claude')
   if (key === 'XUNJI_CHAT_IMPORT') return value === '' || value === 'on' || value === 'off'
   if (key === 'CONFLUENCE_SSL_VERIFY') return value === '' || value === 'true' || value === 'false'

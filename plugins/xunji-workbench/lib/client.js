@@ -36,7 +36,7 @@ var XunjiWorkbench = (function(exports, react, react_jsx_runtime) {
 		{
 			id: "mastergo",
 			label: "MasterGo",
-			instruction: "只使用 MasterGo Magic MCP 读取设计上下文，结合当前项目规范给出可实施结果；不得修改画布、文件、变量或组件库。"
+			instruction: "只使用 MasterGo Magic MCP 读取设计上下文，结合当前项目规范给出可实施结果；不得修改画布、文件、变量或组件库。用户给出设计稿链接时直接用该链接调用工具；用户只说设计稿名称时，从“已登记的 MasterGo 设计稿”里取对应链接，先用 mcp__getPageLayers 按名称找到页面或图层，再用 mcp__getDesignSections 读取；名称不在登记表里时请用户提供链接，不要猜。"
 		},
 		{
 			id: "confluence",
@@ -203,25 +203,35 @@ var XunjiWorkbench = (function(exports, react, react_jsx_runtime) {
 			label: "MasterGo",
 			description: "通过 Magic MCP 获取设计上下文",
 			readOnlyScope: "只读 DSL / D2C，不修改画布或设计资产",
-			variables: ["MG_MCP_TOKEN"],
-			fields: [{
-				key: "MG_MCP_TOKEN",
-				label: "个人访问令牌",
-				placeholder: "MasterGo token",
-				secret: true
-			}, {
-				key: "MASTERGO_API_BASE_URL",
-				label: "服务地址",
-				placeholder: "https://mastergo.com",
-				optional: true
-			}],
+			variables: ["MG_MCP_TOKEN", "XUNJI_MASTERGO_FILES"],
+			fields: [
+				{
+					key: "MG_MCP_TOKEN",
+					label: "个人访问令牌",
+					placeholder: "MasterGo token",
+					secret: true
+				},
+				{
+					key: "MASTERGO_API_BASE_URL",
+					label: "服务地址",
+					placeholder: "https://mastergo.com",
+					optional: true
+				},
+				{
+					key: "XUNJI_MASTERGO_FILES",
+					label: "登记设计稿",
+					placeholder: "商城后台=https://mastergo.com/file/…；多个用英文分号分隔",
+					optional: true
+				}
+			],
 			help: {
 				label: "查看 Magic MCP 官方说明",
 				href: "https://mastergo.com/help/ai-features/magic-mcp.html",
 				steps: [
 					"登录 MasterGo，进入个人设置",
 					"在“安全设置”生成个人访问令牌",
-					"确认账号为团队版且设计文件位于有权限的团队项目"
+					"确认账号为团队版且设计文件位于有权限的团队项目",
+					"Magic MCP 没有搜索：把常用设计文件按“名称=链接”登记后，提问时说名称即可，不必每次贴链接"
 				]
 			}
 		},
