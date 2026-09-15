@@ -1,0 +1,19 @@
+# 兼容 Confluence Server/Data Center 6.0+；目标 7.1 使用用户名+密码认证。
+- insert:
+    - id: mcp-confluence-dc
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: confluence_dc
+        transport: stdio
+        command: uvx
+        args: ['mcp-atlassian==0.23.0']
+        env:
+          CONFLUENCE_URL: !!js process.env.CONFLUENCE_URL
+          CONFLUENCE_USERNAME: !!js process.env.CONFLUENCE_USERNAME
+          CONFLUENCE_API_TOKEN: !!js process.env.CONFLUENCE_API_TOKEN
+          CONFLUENCE_SSL_VERIFY: !!js process.env.CONFLUENCE_SSL_VERIFY
+          READ_ONLY_MODE: 'true'
+          TOOLSETS: 'confluence_pages'
+          ENABLED_TOOLS: 'confluence_search,confluence_get_page,confluence_get_page_children'
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false

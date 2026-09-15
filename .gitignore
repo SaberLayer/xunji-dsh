@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.dsh/
+.dsh-next/
+.env
+*.log
+coverage/
+.playwright-cli/
+shell/target/
+# 编辑器本地历史、AI 工具的本机设置与临时产物
+.history/
+.claude/
+output/
+.pnpm-store/
+# Tauri 构建时自动生成
+shell/gen/

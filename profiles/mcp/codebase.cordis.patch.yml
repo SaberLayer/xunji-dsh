@@ -1,0 +1,14 @@
+# 本机代码库检索：仅读取用户显式登记的绝对路径，索引存放在 DSH Profile 内。
+- insert:
+    - id: mcp-codebase
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: codebase
+        transport: stdio
+        command: node
+        args: ['scripts/codebase-mcp.mjs']
+        env:
+          XUNJI_CODEBASE_PATHS: !!js process.env.XUNJI_CODEBASE_PATHS
+          XUNJI_CODEBASE_INDEX_DIR: !!js process.env.XUNJI_CODEBASE_INDEX_DIR
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false

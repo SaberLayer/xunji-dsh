@@ -1,0 +1,27 @@
+[package]
+name = "workbench-shell"
+version = "0.1.0"
+edition = "2021"
+description = "寻迹助手桌面外壳"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde_json = "1"
+
+[target.'cfg(windows)'.dependencies]
+# 作业对象：外壳被强制结束时，服务子进程树一并终止，不留孤儿
+windows-sys = { version = "0.59", features = [
+  "Win32_Foundation",
+  # CreateJobObjectW 的签名带 SECURITY_ATTRIBUTES，需同时启用 Security
+  "Win32_Security",
+  "Win32_System_JobObjects",
+  "Win32_System_Threading",
+] }
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true

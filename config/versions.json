@@ -1,0 +1,29 @@
+{
+  "node": ">=22.19.0",
+  "packageManager": "pnpm@11.21.0",
+  "dsh": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.5-rc.2",
+    "tag": "dsh-v0.1.5-rc.2",
+    "commit": "fb2c4b9e698e30edb738bca4cf0618587db7d203"
+  },
+  "pets": {
+    "default": "none",
+    "harness-pet": "github:cakeni/harness-pet#29bb8f0fbba5514b83300a103e2a1088a02b433a",
+    "deepseek-harness-pets": "github:orxz/deepseek-harness-pets#62b3e498cdb0bb7acbe3043a9e84eaba905f1e09",
+    "deepseek-pet": "github:keleus/deepseek-pet#35132a4fcfa1a40e4cab7e0163939cc5b25de38b"
+  },
+  "buildAllow": {
+    "harness-pet": "harness-pet@https://codeload.github.com/cakeni/harness-pet/tar.gz/29bb8f0fbba5514b83300a103e2a1088a02b433a"
+  },
+  "plugins": {
+    "knowledge": "dsh-knowledge-sqlite@0.1.9",
+    "larkBridge": "github:imetn/dsh-lark-bridge#f1e544cce5108873e238313bf7c5ccf092827e2a",
+    "checkpoint": "github:PerryLink/dsh-checkpoint-rewind#f070f47a2f2171ebaf5ed33672a3c230256d6e4e"
+  },
+  "mcp": {
+    "mastergo": "@mastergo/magic-mcp@0.2.8",
+    "lark": "@larksuiteoapi/lark-mcp@0.5.1",
+    "atlassianDataCenter": "mcp-atlassian==0.23.0"
+  }
+}

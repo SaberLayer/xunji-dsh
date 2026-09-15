@@ -1,0 +1,10 @@
+# 默认层保持轻量：不安装宠物，本地知识仅做词法检索，写入仍需审批。
+- id: agent-default-model
+  config:
+    provider: deepseek-official
+    model: deepseek-v4-flash-vision-exp
+- id: knowledge-sqlite
+  config:
+    gating: ask
+    queryExpansion:
+      enabled: false

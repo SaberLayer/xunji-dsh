@@ -1,0 +1,13 @@
+# 飞书对话导入：只读取用户显式放入 Xunji 导入目录的导出文件，不访问飞书远端。
+- insert:
+    - id: mcp-chat-import
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: chat-import
+        transport: stdio
+        command: node
+        args: ['scripts/chat-import-mcp.mjs']
+        env:
+          XUNJI_CHAT_IMPORT_DIR: !!js process.env.XUNJI_CHAT_IMPORT_DIR
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false

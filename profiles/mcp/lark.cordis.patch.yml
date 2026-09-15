@@ -1,0 +1,20 @@
+- insert:
+    - id: mcp-lark
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: lark
+        transport: stdio
+        command: npx
+        args:
+          - '-y'
+          - '@larksuiteoapi/lark-mcp@0.5.1'
+          - 'mcp'
+          - '-a'
+          - !!js process.env.LARK_APP_ID
+          - '-s'
+          - !!js process.env.LARK_APP_SECRET
+          - '-t'
+          - 'docx.v1.document.rawContent,docx.builtin.search,wiki.v2.space.getNode,wiki.v1.node.search'
+        env: {}
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false

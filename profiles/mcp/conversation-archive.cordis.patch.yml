@@ -1,0 +1,14 @@
+# Codex / Claude 本机历史归档：仅读取用户明确启用的本机历史与记忆文件。
+- insert:
+    - id: mcp-conversation-archive
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: conversation-archive
+        transport: stdio
+        command: node
+        args: ['scripts/conversation-archive-mcp.mjs']
+        env:
+          XUNJI_CONVERSATION_ARCHIVE: !!js process.env.XUNJI_CONVERSATION_ARCHIVE
+          XUNJI_CONVERSATION_ARCHIVE_INDEX_DIR: !!js process.env.XUNJI_CONVERSATION_ARCHIVE_INDEX_DIR
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false

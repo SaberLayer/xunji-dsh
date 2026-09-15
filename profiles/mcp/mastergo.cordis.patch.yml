@@ -1,0 +1,14 @@
+- insert:
+    - id: mcp-mastergo
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: mastergo
+        transport: stdio
+        command: npx
+        args: ['-y', '@mastergo/magic-mcp@0.2.8']
+        env:
+          MG_MCP_TOKEN: !!js process.env.MG_MCP_TOKEN
+          API_BASE_URL: !!js process.env.MASTERGO_API_BASE_URL
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false
+
