@@ -29,7 +29,8 @@ DisableDirPage=no
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 OutputDir={#OutputDir}
-OutputBaseFilename={#AppName}-{#AppVersion}-安装
+; 文件名只用 ASCII：GitHub Release 会剥掉附件名里的非 ASCII 字符
+OutputBaseFilename=xunji-{#AppVersion}-setup
 ; 依赖有两万多个小文件，固实+极限压缩会让解压变成单线程长任务。
 ; 这里换成分块压缩并开多线程，包体略大但安装时间从十分钟级降到分钟级。
 Compression=lzma2/normal
