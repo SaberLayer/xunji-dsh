@@ -63,6 +63,8 @@ npm run package:installer
 
 分支约定、本地验证和提 PR 的方式见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
+本项目在 AI 辅助下开发：代码由人与 AI 协作完成，所有改动经人工审阅，并由 CI 上的测试覆盖。欢迎同样方式的贡献，标准只有一个，就是改动能说清楚、测试能过。
+
 ## 许可证
 
 [MIT](LICENSE)
