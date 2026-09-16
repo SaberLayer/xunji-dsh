@@ -1,0 +1,52 @@
+# 推送 v* 标签时在干净的 Windows 机器上完整构建：检查、打包应用目录、编译安装包，然后发布 Release 并挂上安装包。
+# 发布前只需把 package.json 的 version 改成对应版本并打同名标签，例如 version 0.1.1 对应标签 v0.1.1。
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          # 安装包内置的 Node 运行时就是这里的版本，与开发机保持一致
+          node-version: 24.18.0
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: shell
+      - name: 安装 Inno Setup
+        run: choco install innosetup --no-progress -y
+      - name: 校验标签与 package.json 版本一致
+        shell: bash
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "标签 $GITHUB_REF_NAME 与 package.json 的版本 $version 不一致，请先改版本号再打标签"
+            exit 1
+          fi
+      - name: 安装依赖
+        run: npx -y pnpm@11.21.0 install --frozen-lockfile
+      - name: 体检、类型检查、构建与测试
+        run: npm run check
+        env:
+          CI: 'true'
+      - name: 打包应用目录
+        run: npm run package
+        env:
+          CI: 'true'
+      - name: 编译安装包
+        run: npm run package:installer
+      - name: 发布 Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: 寻迹助手 ${{ github.ref_name }}
+          files: dist/xunji-*-setup.exe
+          generate_release_notes: true

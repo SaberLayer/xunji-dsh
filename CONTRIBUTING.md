@@ -32,4 +32,11 @@ cargo test --locked
 
 ## 发布
 
-维护者在本机执行 `npm run package` 与 `npm run package:installer` 生成安装包，打 `vX.Y.Z` 标签并在 Releases 挂上安装包。
+发布由 GitHub Actions 完成：把 `package.json` 的 `version` 改成新版本并合并到 `main`，然后打同名标签推送，例如：
+
+```powershell
+git tag v0.1.1
+git push origin v0.1.1
+```
+
+工作流会在干净的 Windows 机器上跑完整检查、构建应用目录、编译安装包，并自动创建 Release 挂上 `xunji-<版本>-setup.exe`。标签与版本号不一致时会直接失败。本机的 `npm run package` 与 `npm run package:installer` 只用于自测。
