@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync,
 import { basename, join, relative, resolve } from 'node:path'
 import { matchedPositions, searchTokens } from './search-utils.mjs'
 import { createHash } from 'node:crypto'
+import { serveMcp, textResult } from './mcp-server.mjs'
 
 const enabledSources = new Set((process.env.XUNJI_CONVERSATION_ARCHIVE ?? '').split(',').map((value) => value.trim().toLocaleLowerCase()).filter(Boolean))
 const userHome = process.env.USERPROFILE || process.env.HOME || ''
@@ -310,10 +311,6 @@ function refreshIfChanged() {
   rebuild(groups)
 }
 
-function textResult(value) {
-  return { content: [{ type: 'text', text: JSON.stringify(value, null, 2) }] }
-}
-
 function search({ query, source, project, limit = 8 }) {
   refreshIfChanged()
   const queryTerms = searchTokens(query)
@@ -352,38 +349,24 @@ const tools = [
   { name: 'conversation_archive_read', description: '读取 conversation_archive_search 返回的单条归档内容。', inputSchema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] } },
 ]
 
-function reply(message) { process.stdout.write(`${JSON.stringify(message)}\n`) }
-function handle(message) {
-  if (!Object.prototype.hasOwnProperty.call(message, 'id')) return
-  try {
-    let result
-    if (message.method === 'initialize') result = { protocolVersion: message.params?.protocolVersion ?? '2025-03-26', capabilities: { tools: {} }, serverInfo: { name: 'xunji-conversation-archive', version: '0.1.0' } }
-    else if (message.method === 'tools/list') result = { tools }
-    else if (message.method === 'tools/call') {
-      const args = message.params?.arguments ?? {}
-      if (message.params?.name === 'conversation_archive_list') {
-        refreshIfChanged()
-        const bySource = Object.fromEntries([...enabledSources].map((source) => [source, archives.filter((doc) => doc.source === source).length]))
-        const limitedFiles = [...memoryCache.values()].flatMap((files) => [...files.values()]).filter((file) => file.docs.length >= maxRecordsPerFile).map((file) => file.path)
-        result = textResult({ sources: [...enabledSources], records: archives.length, bySource, skippedFiles, limitedFiles, limits: { maxSessionBytes, maxRecordsPerFile, maxTextLength }, truncatedRecords: archives.filter((doc) => doc.truncated).length })
-      }
-      else if (message.params?.name === 'conversation_archive_search') result = textResult(search(args))
-      else if (message.params?.name === 'conversation_archive_read') {
-        refreshIfChanged()
-        const doc = archives.find((entry) => entry.id === args.id)
-        if (!doc) throw new Error('未找到归档条目；只能读取 search 返回的 id')
-        result = textResult({ id: doc.id, source: doc.source, kind: doc.kind, timestamp: doc.timestamp, project: doc.project, session: doc.session, path: doc.path, content: doc.content, truncated: doc.truncated })
-      } else throw new Error('未知历史归档工具')
-    } else throw new Error('不支持的方法')
-    reply({ jsonrpc: '2.0', id: message.id, result })
-  } catch (error) { reply({ jsonrpc: '2.0', id: message.id, error: { code: -32000, message: error instanceof Error ? error.message : '历史归档工具失败' } }) }
-}
-
-let buffer = ''
-process.stdin.setEncoding('utf8')
-process.stdin.on('data', (chunk) => {
-  buffer += chunk
-  const rows = buffer.split(/\r?\n/)
-  buffer = rows.pop() ?? ''
-  for (const row of rows) if (row.trim()) { try { handle(JSON.parse(row)) } catch { /* 忽略非法协议行 */ } }
+serveMcp({
+  name: 'xunji-conversation-archive',
+  tools,
+  failure: '历史归档工具失败',
+  call(name, args) {
+    if (name === 'conversation_archive_list') {
+      refreshIfChanged()
+      const bySource = Object.fromEntries([...enabledSources].map((source) => [source, archives.filter((doc) => doc.source === source).length]))
+      const limitedFiles = [...memoryCache.values()].flatMap((files) => [...files.values()]).filter((file) => file.docs.length >= maxRecordsPerFile).map((file) => file.path)
+      return textResult({ sources: [...enabledSources], records: archives.length, bySource, skippedFiles, limitedFiles, limits: { maxSessionBytes, maxRecordsPerFile, maxTextLength }, truncatedRecords: archives.filter((doc) => doc.truncated).length })
+    }
+    if (name === 'conversation_archive_search') return textResult(search(args))
+    if (name === 'conversation_archive_read') {
+      refreshIfChanged()
+      const doc = archives.find((entry) => entry.id === args.id)
+      if (!doc) throw new Error('未找到归档条目；只能读取 search 返回的 id')
+      return textResult({ id: doc.id, source: doc.source, kind: doc.kind, timestamp: doc.timestamp, project: doc.project, session: doc.session, path: doc.path, content: doc.content, truncated: doc.truncated })
+    }
+    throw new Error('未知历史归档工具')
+  },
 })

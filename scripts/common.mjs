@@ -258,13 +258,16 @@ export const featureRequirements = {
     patch: 'chat-import.cordis.patch.yml',
     env: ['XUNJI_CHAT_IMPORT'],
     commands: ['node'],
+    // 开关型变量：只有明确为 on 才算启用，填 off 不能被“非空即启用”误判
+    enabled: (environment) => environment.XUNJI_CHAT_IMPORT?.trim() === 'on',
+    disabledHint: '请先将 XUNJI_CHAT_IMPORT 设置为 on',
   },
 }
 
 export function configuredFeatures(environment = process.env) {
   return Object.entries(featureRequirements)
-    .filter(([name]) => name !== 'chat-import' || environment.XUNJI_CHAT_IMPORT?.trim() === 'on')
     .filter(([, requirement]) => requirement.env.every((key) => Boolean(environment[key]?.trim())))
+    .filter(([, requirement]) => requirement.enabled?.(environment) ?? true)
     .map(([name]) => name)
 }
 
@@ -274,7 +277,7 @@ export function validateFeatures(features) {
   const errors = []
   for (const name of features) {
     const requirement = featureRequirements[name]
-    if (name === 'chat-import' && process.env.XUNJI_CHAT_IMPORT?.trim() !== 'on') errors.push('chat-import: 请先将 XUNJI_CHAT_IMPORT 设置为 on')
+    if (requirement.enabled && !requirement.enabled(process.env)) errors.push(`${name}: ${requirement.disabledHint ?? '未启用'}`)
     for (const key of requirement.env) {
       if (!process.env[key]?.trim()) errors.push(`${name}: 缺少环境变量 ${key}`)
     }

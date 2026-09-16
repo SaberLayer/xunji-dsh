@@ -13,11 +13,11 @@ test('解析并比较 Node 版本', () => {
   assert.equal(compareVersion('22.17.1', '22.19.0'), -1)
 })
 
-test('拒绝未知企业能力', () => {
+test('拒绝未知资料源名称', () => {
   assert.throws(() => validateFeatures(['unknown']), /未知能力/)
 })
 
-test('未启用企业能力时不要求任何密钥', () => {
+test('没有启用任何资料源时不要求密钥', () => {
   assert.deepEqual(validateFeatures([]), [])
 })
 

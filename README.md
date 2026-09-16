@@ -55,7 +55,7 @@ npm run package:installer
 |---|---|
 | `profiles/` | DSH 配置层：默认 Profile 与各资料源的 MCP 接入定义 |
 | `plugins/xunji-workbench/` | 工作台插件：资料路由提示词、配置页、来源标注 |
-| `scripts/` | 启动、配置服务、本机检索 MCP、只读代理、打包 |
+| `scripts/` | 启动、配置服务、本机检索 MCP 及其协议骨架、只读代理、打包 |
 | `shell/` | Tauri 桌面外壳 |
 | `docs/` | 使用说明、隐私说明、开发指南 |
 

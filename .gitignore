@@ -14,3 +14,5 @@ output/
 .pnpm-store/
 # Tauri 构建时自动生成
 shell/gen/
+# 插件构建产物：npm test / setup / package 都会先构建
+plugins/xunji-workbench/lib/

@@ -17,6 +17,7 @@
     "workbench:typecheck": "npm --prefix plugins/xunji-workbench run typecheck",
     "package": "npm run workbench:build && node scripts/package-app.mjs",
     "package:installer": "node scripts/package-installer.mjs",
+    "pretest": "npm run workbench:build",
     "test": "node --test tests/*.test.mjs",
     "check": "npm run doctor && npm run workbench:typecheck && npm run workbench:build && npm test"
   },

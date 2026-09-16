@@ -4,15 +4,12 @@ import { createHash } from 'node:crypto'
 import { conversationNameFrom, dedupeMessages, messageFingerprint, parseLarkChatMarkdown } from './lark-chat-parser.mjs'
 import { matchedPositions, searchTokens } from './search-utils.mjs'
 import { MAX_IMPORT_BYTES, readExportBuffer } from './chat-import-files.mjs'
+import { serveMcp, textResult } from './mcp-server.mjs'
 
 const importDir = process.env.XUNJI_CHAT_IMPORT_DIR || join(process.cwd(), '.dsh', 'imports')
 const indexPath = join(importDir, 'index.json')
 const maxFileBytes = MAX_IMPORT_BYTES
 const maxMessageLength = 4000
-
-function textResult(value) {
-  return { content: [{ type: 'text', text: JSON.stringify(value, null, 2) }] }
-}
 
 function readExport(path) {
   const extension = extname(path).toLocaleLowerCase()
@@ -187,32 +184,17 @@ const tools = [
   { name: 'chat_import_read', description: '读取 chat_import_search 命中消息及其前后上下文。', inputSchema: { type: 'object', properties: { id: { type: 'string' }, before: { type: 'integer', minimum: 0, maximum: 20 }, after: { type: 'integer', minimum: 0, maximum: 20 } }, required: ['id'] } },
 ]
 
-function reply(message) { process.stdout.write(`${JSON.stringify(message)}\n`) }
-function handle(message) {
-  if (!Object.prototype.hasOwnProperty.call(message, 'id')) return
-  try {
-    let result
-    if (message.method === 'initialize') result = { protocolVersion: message.params?.protocolVersion ?? '2025-03-26', capabilities: { tools: {} }, serverInfo: { name: 'xunji-chat-import', version: '0.1.0' } }
-    else if (message.method === 'tools/list') result = { tools }
-    else if (message.method === 'tools/call') {
-      const args = message.params?.arguments ?? {}
-      if (message.params?.name === 'chat_import_list') {
-        refreshIfChanged()
-        result = textResult({ directory: importDir, conversations: index.conversations, files: index.files, updatedAt: index.updatedAt })
-      }
-      else if (message.params?.name === 'chat_import_search') result = textResult(search(args))
-      else if (message.params?.name === 'chat_import_read') result = textResult(readContext(args))
-      else throw new Error('未知对话导入工具')
-    } else throw new Error('不支持的方法')
-    reply({ jsonrpc: '2.0', id: message.id, result })
-  } catch (error) { reply({ jsonrpc: '2.0', id: message.id, error: { code: -32000, message: error instanceof Error ? error.message : '对话导入工具失败' } }) }
-}
-
-let buffer = ''
-process.stdin.setEncoding('utf8')
-process.stdin.on('data', (chunk) => {
-  buffer += chunk
-  const rows = buffer.split(/\r?\n/)
-  buffer = rows.pop() ?? ''
-  for (const row of rows) if (row.trim()) { try { handle(JSON.parse(row)) } catch { /* 忽略非法协议行 */ } }
+serveMcp({
+  name: 'xunji-chat-import',
+  tools,
+  failure: '对话导入工具失败',
+  call(name, args) {
+    if (name === 'chat_import_list') {
+      refreshIfChanged()
+      return textResult({ directory: importDir, conversations: index.conversations, files: index.files, updatedAt: index.updatedAt })
+    }
+    if (name === 'chat_import_search') return textResult(search(args))
+    if (name === 'chat_import_read') return textResult(readContext(args))
+    throw new Error('未知对话导入工具')
+  },
 })

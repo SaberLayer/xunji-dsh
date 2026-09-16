@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, writeFileSync } from 'node:fs'
 import { basename, extname, isAbsolute, join, relative, resolve } from 'node:path'
 import { matchedPositions, searchTokens } from './search-utils.mjs'
+import { serveMcp, textResult } from './mcp-server.mjs'
 
 const roots = (process.env.XUNJI_CODEBASE_PATHS ?? '').split(';').map((value) => value.trim()).filter(Boolean)
 const indexDir = process.env.XUNJI_CODEBASE_INDEX_DIR || join(process.cwd(), '.dsh', 'codebase-index')
@@ -94,10 +95,6 @@ function refreshIfChanged() {
 }
 refreshIfChanged()
 
-function textResult(value) {
-  return { content: [{ type: 'text', text: JSON.stringify(value, null, 2) }] }
-}
-
 function search({ query, codebase, limit = 8 }) {
   const queryTerms = searchTokens(query)
   if (!queryTerms.length) throw new Error('query 至少包含两个字符')
@@ -140,30 +137,15 @@ const tools = [
   { name: 'codebase_read_file', description: '读取 codebase_search 命中的文件片段。', inputSchema: { type: 'object', properties: { codebase: { type: 'string' }, path: { type: 'string' }, start_line: { type: 'integer', minimum: 1 }, end_line: { type: 'integer', minimum: 1, maximum: 400 } }, required: ['codebase', 'path'] } },
 ]
 
-function reply(message) { process.stdout.write(`${JSON.stringify(message)}\n`) }
-function handle(message) {
-  if (!Object.prototype.hasOwnProperty.call(message, 'id')) return
-  try {
-    let result
-    if (message.method === 'initialize') result = { protocolVersion: message.params?.protocolVersion ?? '2025-03-26', capabilities: { tools: {} }, serverInfo: { name: 'xunji-codebase', version: '0.1.0' } }
-    else if (message.method === 'tools/list') result = { tools }
-    else if (message.method === 'tools/call') {
-      refreshIfChanged()
-      const args = message.params?.arguments ?? {}
-      if (message.params?.name === 'codebase_list') result = textResult(codebases.map((base) => base.error ? { root: base.root, error: base.error } : { name: base.name, root: base.root, files: base.docs.length, limitReached: base.docs.length >= maxFilesPerRoot }))
-      else if (message.params?.name === 'codebase_search') result = textResult(search(args))
-      else if (message.params?.name === 'codebase_read_file') result = textResult(readCode(args))
-      else throw new Error('未知代码库工具')
-    } else throw new Error('不支持的方法')
-    reply({ jsonrpc: '2.0', id: message.id, result })
-  } catch (error) { reply({ jsonrpc: '2.0', id: message.id, error: { code: -32000, message: error instanceof Error ? error.message : '代码库工具失败' } }) }
-}
-
-let buffer = ''
-process.stdin.setEncoding('utf8')
-process.stdin.on('data', (chunk) => {
-  buffer += chunk
-  const rows = buffer.split(/\r?\n/)
-  buffer = rows.pop() ?? ''
-  for (const row of rows) if (row.trim()) { try { handle(JSON.parse(row)) } catch { /* 忽略非法协议行 */ } }
+serveMcp({
+  name: 'xunji-codebase',
+  tools,
+  failure: '代码库工具失败',
+  call(name, args) {
+    refreshIfChanged()
+    if (name === 'codebase_list') return textResult(codebases.map((base) => base.error ? { root: base.root, error: base.error } : { name: base.name, root: base.root, files: base.docs.length, limitReached: base.docs.length >= maxFilesPerRoot }))
+    if (name === 'codebase_search') return textResult(search(args))
+    if (name === 'codebase_read_file') return textResult(readCode(args))
+    throw new Error('未知代码库工具')
+  },
 })
